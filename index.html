@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-900">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Magic Safari - ตะลุย 10 ด่านคณิตศาสตร์แสนสนุก</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Google Fonts: Mitr & Fredoka -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      font-family: 'Mitr', 'Fredoka', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Floating & Bouncing Animations */
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+
+    @keyframes happyJump {
+      0%, 100% { transform: translateY(0) scale(1); }
+      30% { transform: translateY(-35px) scale(1.1) rotate(-5deg); }
+      50% { transform: translateY(0) scale(0.95); }
+      75% { transform: translateY(-15px) scale(1.05) rotate(5deg); }
+    }
+
+    @keyframes shakeWrong {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-12px) rotate(-4deg); }
+      40%, 80% { transform: translateX(12px) rotate(4deg); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 15px rgba(253, 224, 71, 0.6)); }
+      50% { filter: drop-shadow(0 0 28px rgba(253, 224, 71, 0.95)); }
+    }
+
+    .animate-float {
+      animation: floaty 3.5s ease-in-out infinite;
+    }
+
+    .animate-happy {
+      animation: happyJump 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .animate-wrong {
+      animation: shakeWrong 0.5s ease-in-out;
+    }
+
+    .glow-yellow {
+      animation: pulseGlow 2s infinite;
+    }
+
+    /* Cute Glassmorphism & Shadow Utilities */
+    .cute-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+      border: 4px solid #fbcfe8;
+    }
+
+    .cute-btn {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    .cute-btn:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 12px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .cute-btn:active {
+      transform: translateY(4px) scale(0.98);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    /* Background Pattern Gradient */
+    .bg-cute-pattern {
+      background-color: #0f172a;
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(244, 114, 182, 0.3) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(96, 165, 250, 0.3) 0px, transparent 50%),
+        radial-gradient(at 50% 80%, rgba(52, 211, 153, 0.3) 0px, transparent 50%),
+        radial-gradient(at 80% 80%, rgba(251, 191, 36, 0.25) 0px, transparent 50%);
+    }
+  </style>
+</head>
+
+<body class="h-full w-full bg-cute-pattern text-slate-800 flex flex-col justify-between overflow-x-hidden min-h-screen">
+
+  <!-- Top Bar: Progress, Level, and Stars -->
+  <header class="w-full max-w-4xl mx-auto p-4 flex flex-col sm:flex-row items-center justify-between gap-3 z-20">
+    <!-- Game Title Badge -->
+    <div class="flex items-center space-x-3 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border-2 border-pink-300">
+      <span class="text-3xl animate-bounce">🐻</span>
+      <div>
+        <h1 class="font-bold text-lg text-pink-600 leading-none">Math Safari</h1>
+        <p class="text-xs text-slate-500 font-medium">ตะลุยคำนวณ 10 ด่านสุดน่ารัก</p>
+      </div>
+    </div>
+
+    <!-- Level & Star Counters -->
+    <div class="flex items-center space-x-3 bg-white/90 backdrop-blur-md px-5 py-2 rounded-2xl shadow-lg border-2 border-amber-300">
+      <div class="flex items-center space-x-1.5">
+        <span class="text-xs font-bold text-slate-500">ด่าน:</span>
+        <span id="levelText" class="text-xl font-extrabold text-indigo-600">1/10</span>
+      </div>
+      <div class="h-6 w-0.5 bg-slate-200"></div>
+      <div class="flex items-center space-x-1.5">
+        <span class="text-2xl text-amber-400">⭐</span>
+        <span id="scoreText" class="text-xl font-extrabold text-amber-500">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar Bar Across 10 Levels -->
+  <div class="w-full max-w-2xl mx-auto px-4 mb-2">
+    <div class="w-full bg-slate-800/60 backdrop-blur rounded-full h-4 p-1 border border-white/20 shadow-inner">
+      <div id="progressBar" class="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 h-full rounded-full transition-all duration-500 ease-out w-[10%] shadow-md"></div>
+    </div>
+  </div>
+
+  <!-- Main Game Stage -->
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-2 flex flex-col items-center justify-center relative">
+    
+    <!-- Cartoon Mascot Area & Speech Bubble -->
+    <div class="w-full flex flex-col sm:flex-row items-center justify-center gap-4 mb-3 z-10">
+      
+      <!-- Mascot Wrapper -->
+      <div id="mascotContainer" class="relative transition-transform duration-300">
+        <!-- Cute SVG Mascot Graphic -->
+        <div id="mascotSvg" class="w-28 h-28 sm:w-36 sm:w-36 filter drop-shadow-xl animate-float cursor-pointer" onclick="triggerMascotTrick()">
+          <!-- SVG Mascot will be injected via JS based on character theme -->
+        </div>
+      </div>
+
+      <!-- Mascot Speech Bubble -->
+      <div class="relative bg-white border-4 border-amber-300 rounded-3xl p-3.5 sm:p-4 shadow-xl max-w-xs sm:max-w-sm text-center">
+        <!-- Bubble Pointer Triangle -->
+        <div class="hidden sm:block absolute -left-4 top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-t-transparent border-r-[16px] border-r-amber-300 border-b-8 border-b-transparent"></div>
+        <p id="speechBubbleText" class="text-sm sm:text-base font-semibold text-slate-700 leading-snug">
+          สวัสดีครับเพื่อนๆ! มาช่วยเค้าแก้โจทย์คณิตศาสตร์ทั้ง 10 ด่านกันนะ! 🚀
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Question Card Box -->
+    <div id="questionBox" class="w-full max-w-2xl cute-card rounded-3xl p-5 sm:p-8 text-center relative overflow-hidden transition-all duration-300">
+      
+      <!-- Level Category Badge -->
+      <div class="inline-block bg-gradient-to-r from-pink-500 to-rose-400 text-white font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full shadow-md mb-3">
+        <span id="categoryLabel">ด่าน 1: นับจำนวนภาพแสนสนุก</span>
+      </div>
+
+      <!-- Dynamic Question Display -->
+      <div id="questionContainer" class="my-4 min-h-[110px] flex flex-col items-center justify-center">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Options / Answer Buttons Grid -->
+      <div id="optionsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6">
+        <!-- Option buttons dynamically generated -->
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Start Modal Overlay -->
+  <div id="startModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="cute-card max-w-md w-full p-6 sm:p-8 rounded-3xl text-center space-y-5 animate-float border-4 border-pink-400">
+      <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-pink-400 to-indigo-500 flex items-center justify-center text-5xl shadow-xl glow-yellow">
+        🦁
+      </div>
+      
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-pink-600">Math Safari</h2>
+        <p class="text-slate-600 text-sm mt-1">ผจญภัยคณิตศาสตร์ 10 ด่านสุดน่ารัก</p>
+      </div>
+
+      <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-left text-xs sm:text-sm text-slate-700 space-y-1.5">
+        <p class="font-bold text-amber-700 flex items-center gap-1">✨ จุดเด่นของเกม:</p>
+        <p>• สะสมดาวเต็ม 10 ด่านเพื่อรับถ้วยรางวัล 🏆</p>
+        <p>• ตัวการ์ตูนตอบสนอง กระโดดดีใจเมื่อตอบถูก 🎉</p>
+        <p>• ภาพสีสันสดใส และเสียงเอฟเฟกต์สุดน่ารัก 🎵</p>
+      </div>
+
+      <button onclick="startGame()" class="cute-btn w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-extrabold text-xl border-2 border-emerald-300 shadow-lg">
+        🎮 เริ่มเล่นเกมเลย!
+      </button>
+    </div>
+  </div>
+
+  <!-- Victory / Clear Game Modal Overlay -->
+  <div id="victoryModal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4">
+    <div class="cute-card max-w-lg w-full p-8 rounded-3xl text-center space-y-6 border-4 border-amber-400 glow-yellow relative overflow-hidden">
+      
+      <div class="text-7xl animate-bounce mb-2">🏆</div>
+
+      <div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-amber-500">ผ่านครบ 10 ด่านแล้ว!</h2>
+        <p class="text-slate-600 text-base mt-2">ยินดีด้วยนะ! น้องเป็น "ยอดนักคณิตศาสตร์ตัวน้อย" แล้ว 🌟</p>
+      </div>
+
+      <!-- Stats Box -->
+      <div class="bg-gradient-to-r from-amber-100 via-pink-100 to-indigo-100 p-5 rounded-2xl border-2 border-amber-300 flex justify-around items-center">
+        <div>
+          <p class="text-xs text-slate-500 font-bold">ดาวที่ได้รับทั้งหมด</p>
+          <p id="finalStarsText" class="text-3xl font-extrabold text-amber-500">10 / 10 ⭐</p>
+        </div>
+        <div class="h-10 w-0.5 bg-amber-300"></div>
+        <div>
+          <p class="text-xs text-slate-500 font-bold">ฉายาผู้ชนะ</p>
+          <p class="text-lg font-extrabold text-indigo-600">อัจฉริยะตัวน้อย 👑</p>
+        </div>
+      </div>
+
+      <!-- Final Cartoon Reaction SVG -->
+      <div id="finalMascot" class="w-24 h-24 mx-auto"></div>
+
+      <button onclick="restartGame()" class="cute-btn w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-extrabold text-xl border-2 border-pink-300 shadow-xl">
+        🔄 เล่นใหม่อีกครั้ง
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. WEB AUDIO SOUND EFFECTS SYNTHESIZER (No external audio files needed)
+       ========================================================================= */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      try {
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'correct') {
+          // Cheerful Arpeggio Chord (C-E-G-C)
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+            gain.gain.setValueAtTime(0.18, now + idx * 0.07);
+            gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.07 + 0.25);
+            osc.start(now + idx * 0.07);
+            osc.stop(now + idx * 0.07 + 0.25);
+          });
+        } else if (type === 'wrong') {
+          // Gentle encouraging boing
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'victory') {
+          // Fanfare
+          const fanfare = [
+            { f: 523.25, t: 0 },
+            { f: 659.25, t: 0.12 },
+            { f: 783.99, t: 0.24 },
+            { f: 1046.50, t: 0.4 },
+            { f: 880, t: 0.55 },
+            { f: 1046.50, t: 0.7 }
+          ];
+          fanfare.forEach(note => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(note.f, now + note.t);
+            gain.gain.setValueAtTime(0.2, now + note.t);
+            gain.gain.linearRampToValueAtTime(0.01, now + note.t + 0.35);
+            osc.start(now + note.t);
+            osc.stop(now + note.t + 0.35);
+          });
+        }
+      } catch (e) {
+        console.warn("Audio playback exception:", e);
+      }
+    }
+
+    /* =========================================================================
+       2. SVG CARTOON MASCOTS SYSTEM
+       ========================================================================= */
+    const CARTOON_MASCOTS = {
+      bear: `<svg viewBox="0 0 100 100" class="w-full h-full">
+        <!-- Bear Ears -->
+        <circle cx="22" cy="22" r="14" fill="#B45309"/>
+        <circle cx="22" cy="22" r="8" fill="#FDE68A"/>
+        <circle cx="78" cy="22" r="14" fill="#B45309"/>
+        <circle cx="78" cy="22" r="8" fill="#FDE68A"/>
+        <!-- Head -->
+        <circle cx="50" cy="50" r="38" fill="#D97706"/>
+        <!-- Snout -->
+        <ellipse cx="50" cy="60" rx="18" ry="14" fill="#FEF3C7"/>
+        <ellipse cx="50" cy="53" rx="7" ry="5" fill="#451A03"/>
+        <path d="M 50 58 Q 50 65 44 65 M 50 58 Q 50 65 56 65" stroke="#451A03" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Eyes -->
+        <circle cx="36" cy="44" r="5" fill="#1E293B"/>
+        <circle cx="34" cy="42" r="2" fill="#FFFFFF"/>
+        <circle cx="64" cy="44" r="5" fill="#1E293B"/>
+        <circle cx="62" cy="42" r="2" fill="#FFFFFF"/>
+        <!-- Cheeks -->
+        <circle cx="28" cy="54" r="6" fill="#F43F5E" opacity="0.4"/>
+        <circle cx="72" cy="54" r="6" fill="#F43F5E" opacity="0.4"/>
+      </svg>`,
+      
+      rabbit: `<svg viewBox="0 0 100 100" class="w-full h-full">
+        <!-- Rabbit Long Ears -->
+        <ellipse cx="32" cy="20" rx="9" ry="22" fill="#F472B6"/>
+        <ellipse cx="32" cy="20" rx="5" ry="15" fill="#FBCFE8"/>
+        <ellipse cx="68" cy="20" rx="9" ry="22" fill="#F472B6"/>
+        <ellipse cx="68" cy="20" rx="5" ry="15" fill="#FBCFE8"/>
+        <!-- Head -->
+        <circle cx="50" cy="55" r="34" fill="#F472B6"/>
+        <!-- Snout -->
+        <ellipse cx="50" cy="63" rx="14" ry="10" fill="#FFFFFF"/>
+        <polygon points="50,58 45,63 55,63" fill="#BE185D"/>
+        <!-- Eyes -->
+        <circle cx="36" cy="50" r="5" fill="#1E293B"/>
+        <circle cx="34" cy="48" r="2" fill="#FFFFFF"/>
+        <circle cx="64" cy="50" r="5" fill="#1E293B"/>
+        <circle cx="62" cy="48" r="2" fill="#FFFFFF"/>
+        <!-- Cheeks -->
+        <circle cx="26" cy="58" r="6" fill="#FB7185" opacity="0.5"/>
+        <circle cx="74" cy="58" r="6" fill="#FB7185" opacity="0.5"/>
+      </svg>`,
+
+      cat: `<svg viewBox="0 0 100 100" class="w-full h-full">
+        <!-- Cat Ears -->
+        <polygon points="15,40 25,12 45,30" fill="#FB923C"/>
+        <polygon points="20,36 27,18 40,30" fill="#FFEDD5"/>
+        <polygon points="85,40 75,12 55,30" fill="#FB923C"/>
+        <polygon points="80,36 73,18 60,30" fill="#FFEDD5"/>
+        <!-- Head -->
+        <circle cx="50" cy="52" r="35" fill="#F97316"/>
+        <!-- Snout -->
+        <ellipse cx="50" cy="62" rx="12" ry="9" fill="#FFF7ED"/>
+        <polygon points="50,57 46,61 54,61" fill="#C2410C"/>
+        <!-- Whiskers -->
+        <line x1="18" y1="58" x2="32" y2="60" stroke="#7C2D12" stroke-width="2"/>
+        <line x1="18" y1="66" x2="32" y2="64" stroke="#7C2D12" stroke-width="2"/>
+        <line x1="82" y1="58" x2="68" y2="60" stroke="#7C2D12" stroke-width="2"/>
+        <line x1="82" y1="66" x2="68" y2="64" stroke="#7C2D12" stroke-width="2"/>
+        <!-- Big Cute Eyes -->
+        <circle cx="36" cy="48" r="6" fill="#065F46"/>
+        <circle cx="36" cy="48" r="3" fill="#10B981"/>
+        <circle cx="34" cy="46" r="1.5" fill="#FFFFFF"/>
+        <circle cx="64" cy="48" r="6" fill="#065F46"/>
+        <circle cx="64" cy="48" r="3" fill="#10B981"/>
+        <circle cx="62" cy="46" r="1.5" fill="#FFFFFF"/>
+      </svg>`
+    };
+
+    /* =========================================================================
+       3. 10 MATH LEVELS DATA (Curated for engaging basic math)
+       ========================================================================= */
+    const GAME_LEVELS = [
+      {
+        id: 1,
+        category: "ด่าน 1: นับจำนวนผลไม้",
+        type: "count",
+        mascot: "bear",
+        speech: "มาช่วยพี่หมีนับแอปเปิ้ลรวมกันหน่อยครับ! 🍏",
+        render: () => `
+          <div class="flex items-center justify-center gap-3 text-3xl sm:text-4xl font-bold bg-pink-50 p-4 rounded-2xl border-2 border-pink-200">
+            <div class="flex gap-1 bg-white p-2 rounded-xl border border-pink-200">🍏 🍏</div>
+            <span class="text-pink-500 font-extrabold">+</span>
+            <div class="flex gap-1 bg-white p-2 rounded-xl border border-pink-200">🍏 🍏 🍏</div>
+            <span class="text-pink-500 font-extrabold">= ?</span>
+          </div>
+        `,
+        options: [4, 5, 6, 7],
+        correct: 5
+      },
+      {
+        id: 2,
+        category: "ด่าน 2: การบวกเลขพื้นฐาน",
+        type: "add",
+        mascot: "rabbit",
+        speech: "กระต่ายน้อยอยากรู้ว่า 4 + 3 ได้เท่าไหร่เอ่ย? 🐰",
+        render: () => `
+          <div class="text-4xl sm:text-5xl font-extrabold text-indigo-600 bg-indigo-50 px-8 py-5 rounded-2xl border-2 border-indigo-200 shadow-inner">
+            4 + 3 = <span class="text-pink-500 underline decoration-dashed">?</span>
+          </div>
+        `,
+        options: [6, 7, 8, 9],
+        correct: 7
+      },
+      {
+        id: 3,
+        category: "ด่าน 3: การลบเลขแสนสนุก",
+        type: "subtract",
+        mascot: "cat",
+        speech: "มีปลา 8 ตัว โดนกินไป 3 ตัว เหลือปลากี่ตัวครับ? 🐟",
+        render: () => `
+          <div class="text-4xl sm:text-5xl font-extrabold text-amber-600 bg-amber-50 px-8 py-5 rounded-2xl border-2 border-amber-200 shadow-inner">
+            8 - 3 = <span class="text-amber-500 underline">?</span>
+          </div>
+        `,
+        options: [3, 4, 5, 6],
+        correct: 5
+      },
+      {
+        id: 4,
+        category: "ด่าน 4: เติมตัวเลขที่หายไป",
+        type: "missing",
+        mascot: "bear",
+        speech: "ตัวเลขอะไรบวกกับ 5 แล้วได้ 10 น้า? 💭",
+        render: () => `
+          <div class="text-4xl sm:text-5xl font-extrabold text-emerald-600 bg-emerald-50 px-8 py-5 rounded-2xl border-2 border-emerald-200 shadow-inner">
+            <span class="text-emerald-500 border-2 border-emerald-400 px-3 py-1 bg-white rounded-xl">?</span> + 5 = 10
+          </div>
+        `,
+        options: [4, 5, 6, 7],
+        correct: 5
+      },
+      {
+        id: 5,
+        category: "ด่าน 5: เปรียบเทียบจำนวน",
+        type: "compare",
+        mascot: "rabbit",
+        speech: "จำนวนด้านซ้าย มากกว่า หรือ น้อยกว่า ด้านขวาครับ? ⚖️",
+        render: () => `
+          <div class="flex items-center justify-center gap-4 text-3xl sm:text-4xl font-extrabold text-purple-600 bg-purple-50 p-5 rounded-2xl border-2 border-purple-200">
+            <span class="bg-white px-4 py-2 rounded-xl border border-purple-300">9</span>
+            <span class="text-pink-500 bg-pink-100 px-4 py-2 rounded-xl border-2 border-pink-300">?</span>
+            <span class="bg-white px-4 py-2 rounded-xl border border-purple-300">6</span>
+          </div>
+        `,
+        options: [">", "<", "="],
+        correct: ">"
+      },
+      {
+        id: 6,
+        category: "ด่าน 6: การบวกซ้ำเบื้องต้น",
+        type: "multi_add",
+        mascot: "cat",
+        speech: "รวมคุกกี้ 3 จาน จานละ 2 ชิ้น ได้กี่ชิ้น? 🍪",
+        render: () => `
+          <div class="text-3xl sm:text-4xl font-extrabold text-amber-700 bg-amber-50 p-5 rounded-2xl border-2 border-amber-200">
+            2 + 2 + 2 = <span class="text-pink-500 font-black">?</span>
+          </div>
+        `,
+        options: [4, 6, 8, 10],
+        correct: 6
+      },
+      {
+        id: 7,
+        category: "ด่าน 7: บวกเลขสองหลักง่ายๆ",
+        type: "double_add",
+        mascot: "bear",
+        speech: "พี่หมีมีสติ๊กเกอร์ 12 ใบ ได้เพิ่มอีก 6 ใบ รวมเป็นกี่ใบ? 🌟",
+        render: () => `
+          <div class="text-4xl sm:text-5xl font-extrabold text-teal-600 bg-teal-50 px-8 py-5 rounded-2xl border-2 border-teal-200 shadow-inner">
+            12 + 6 = <span class="text-teal-500 underline">?</span>
+          </div>
+        `,
+        options: [16, 17, 18, 19],
+        correct: 18
+      },
+      {
+        id: 8,
+        category: "ด่าน 8: ปริศนารูปทรง",
+        type: "shape_sum",
+        mascot: "rabbit",
+        speech: "ถ้ารูปดาว ⭐ มีค่าเท่ากับ 10 แล้ว ⭐ - 4 คือเท่าไหร่? ✨",
+        render: () => `
+          <div class="text-3xl sm:text-4xl font-extrabold text-indigo-700 bg-indigo-50 p-5 rounded-2xl border-2 border-indigo-200">
+            ⭐ = 10 <br>
+            <span class="text-amber-500">⭐ - 4 = ?</span>
+          </div>
+        `,
+        options: [4, 5, 6, 7],
+        correct: 6
+      },
+      {
+        id: 9,
+        category: "ด่าน 9: โจทย์ปัญหาตัวการ์ตูน",
+        type: "story",
+        mascot: "cat",
+        speech: "เจ้าแมวมีไอศกรีม 15 แท่ง แบ่งให้เพื่อนไป 7 แท่ง เหลือเท่าไหร่? 🍦",
+        render: () => `
+          <div class="text-3xl sm:text-4xl font-extrabold text-rose-600 bg-rose-50 px-6 py-5 rounded-2xl border-2 border-rose-200 shadow-inner">
+            15 - 7 = <span class="text-rose-500 underline">?</span>
+          </div>
+        `,
+        options: [6, 7, 8, 9],
+        correct: 8
+      },
+      {
+        id: 10,
+        category: "ด่าน 10: ด่านบอสคณิตศาสตร์!",
+        type: "boss",
+        mascot: "bear",
+        speech: "ด่านสุดท้ายแล้ว! แก้โจทย์ผสมผสานข้อนี้เพื่อพิชิตถ้วยรางวัล! 🏆",
+        render: () => `
+          <div class="text-3xl sm:text-4xl font-extrabold text-purple-700 bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl border-4 border-purple-300 shadow-md">
+            (5 + 5) - 3 = <span class="text-pink-600 font-black">?</span>
+          </div>
+        `,
+        options: [5, 6, 7, 8],
+        correct: 7
+      }
+    ];
+
+    /* =========================================================================
+       4. GAME STATE & CONTROLLER LOGIC
+       ========================================================================= */
+    let currentLevelIdx = 0;
+    let starsEarned = 0;
+    let isAnsweringBlocked = false;
+
+    function startGame() {
+      document.getElementById('startModal').classList.add('hidden');
+      playSound('click');
+      currentLevelIdx = 0;
+      starsEarned = 0;
+      loadLevel(currentLevelIdx);
+    }
+
+    function loadLevel(idx) {
+      if (idx >= GAME_LEVELS.length) {
+        showVictoryScreen();
+        return;
+      }
+
+      isAnsweringBlocked = false;
+      const level = GAME_LEVELS[idx];
+
+      // Update Header Info
+      document.getElementById('levelText').innerText = `${idx + 1}/10`;
+      document.getElementById('scoreText').innerText = starsEarned;
+      document.getElementById('progressBar').style.width = `${((idx + 1) / 10) * 100}%`;
+
+      // Update Speech & Category
+      document.getElementById('categoryLabel').innerText = level.category;
+      document.getElementById('speechBubbleText').innerText = level.speech;
+
+      // Inject Mascot SVG
+      const mascotBox = document.getElementById('mascotSvg');
+      mascotBox.innerHTML = CARTOON_MASCOTS[level.mascot] || CARTOON_MASCOTS.bear;
+
+      // Inject Question Content
+      document.getElementById('questionContainer').innerHTML = level.render();
+
+      // Build Option Buttons
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
+
+      level.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = `cute-btn py-3.5 sm:py-4 px-3 rounded-2xl font-extrabold text-2xl sm:text-3xl border-2 transition-all duration-200 ${
+          typeof opt === 'string' 
+            ? 'bg-purple-100 border-purple-300 text-purple-700 hover:bg-purple-200' 
+            : 'bg-white border-pink-300 text-pink-600 hover:bg-pink-50'
+        }`;
+        btn.innerText = opt;
+        btn.onclick = () => handleAnswer(opt, level.correct, btn);
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedOpt, correctOpt, btnElement) {
+      if (isAnsweringBlocked) return;
+      isAnsweringBlocked = true;
+
+      const mascotContainer = document.getElementById('mascotContainer');
+      const speechBubble = document.getElementById('speechBubbleText');
+
+      if (selectedOpt === correctOpt) {
+        // CORRECT ANSWER! 🎉
+        playSound('correct');
+        starsEarned += 1;
+        document.getElementById('scoreText').innerText = starsEarned;
+
+        // Cartoon Mascot Happy Animation
+        mascotContainer.classList.add('animate-happy');
+        speechBubble.innerText = "เย้ๆ! ตอบถูกต้องเก่งมากเลยครับ! 🎉✨";
+        
+        // Highlight button green
+        btnElement.classList.remove('bg-white', 'bg-purple-100');
+        btnElement.classList.add('bg-emerald-400', 'text-white', 'border-emerald-300', 'scale-105');
+
+        // Confetti Fireworks Burst
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 60,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+
+        // Delay to next level
+        setTimeout(() => {
+          mascotContainer.classList.remove('animate-happy');
+          currentLevelIdx += 1;
+          loadLevel(currentLevelIdx);
+        }, 1300);
+
+      } else {
+        // INCORRECT ANSWER 😅
+        playSound('wrong');
+        
+        // Cartoon Wobble Animation
+        mascotContainer.classList.add('animate-wrong');
+        speechBubble.innerText = "เกือบถูกแล้ว! ลองใหม่อีกทีนะคนเก่ง! 💪";
+
+        // Highlight button red
+        btnElement.classList.remove('bg-white', 'bg-purple-100');
+        btnElement.classList.add('bg-rose-400', 'text-white', 'border-rose-300');
+
+        setTimeout(() => {
+          mascotContainer.classList.remove('animate-wrong');
+          isAnsweringBlocked = false;
+        }, 700);
+      }
+    }
+
+    function triggerMascotTrick() {
+      playSound('click');
+      const mascotContainer = document.getElementById('mascotContainer');
+      mascotContainer.classList.add('animate-happy');
+      setTimeout(() => mascotContainer.classList.remove('animate-happy'), 850);
+    }
+
+    function showVictoryScreen() {
+      playSound('victory');
+      document.getElementById('victoryModal').classList.remove('hidden');
+      document.getElementById('finalStarsText').innerText = `${starsEarned} / 10 ⭐`;
+      document.getElementById('finalMascot').innerHTML = CARTOON_MASCOTS.bear;
+
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.4 }
+        });
+      }
+    }
+
+    function restartGame() {
+      document.getElementById('victoryModal').classList.add('hidden');
+      startGame();
+    }
+
+    // Initialize initial Mascot Graphic on Load
+    window.onload = () => {
+      document.getElementById('mascotSvg').innerHTML = CARTOON_MASCOTS.bear;
+    };
+  </script>
+</body>
+</html>
